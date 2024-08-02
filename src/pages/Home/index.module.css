@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  text-align: center;
+  padding: 20px;
+}
+
+.greeting {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.greetingText {
+  font-size: 2rem;
+  color: #4a90e2;
+  animation: fadeIn 3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content {
+  margin-top: 20%;
+  font-size: 1.25rem;
+  color: #333;
+}
