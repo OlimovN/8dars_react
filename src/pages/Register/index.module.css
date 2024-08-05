@@ -46,3 +46,23 @@ button:hover {
   font-size: 0.875rem;
   margin: -10px 0 10px 0;
 }
+
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+input.error {
+  border-color: #e74c3c;
+}

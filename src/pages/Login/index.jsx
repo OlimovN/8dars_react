@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./index.module.css";
-import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({ setToken }) {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -10,10 +10,9 @@ function Login() {
   const validate = () => {
     const newErrors = {};
     if (formData.username.length < 3)
-      newErrors.username = "Username isn't valid";
-    if (formData.password.length < 3)
-      newErrors.password = "Password isn't valid";
-
+      newErrors.username = "Username must be at least 3 characters";
+    if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -37,17 +36,14 @@ function Login() {
       );
       const data = await response.json();
 
-      if (data.message === "Invalid Password!") {
-        setErrors({ password: data.message });
+      if (data.message) {
+        setErrors({ general: data.message });
         return;
       }
-      if (data.message === "User Not found.") {
-        setErrors({ username: data.message });
-        return;
-      }
+
       if (data.accessToken) {
-        localStorage.setItem("user", JSON.stringify(formData));
         localStorage.setItem("accessToken", data.accessToken);
+        setToken(data.accessToken);
         navigate("/");
       }
     } catch (error) {
@@ -83,9 +79,14 @@ function Login() {
           <p className={styles.errorText}>{errors.password}</p>
         )}
 
+        {errors.general && <p className={styles.errorText}>{errors.general}</p>}
+
         <button type="submit" className={styles.button}>
           Login
         </button>
+        <p>
+          Don't have an account? <Link to="/register">Register here</Link>
+        </p>
       </form>
     </div>
   );

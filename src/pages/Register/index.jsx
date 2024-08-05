@@ -1,13 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./index.module.css";
-import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    rePassword: "",
+    repassword: "",
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -15,15 +15,13 @@ function Register() {
   const validate = () => {
     const newErrors = {};
     if (formData.username.length < 3)
-      newErrors.username = "Username is too short";
-    if (formData.email.length < 3) newErrors.email = "Email is too short";
-    if (formData.password.length < 3)
-      newErrors.password = "Password is too short";
-    if (formData.rePassword.length < 3)
-      newErrors.rePassword = "Re-enter password is too short";
-    if (formData.password !== formData.rePassword)
-      newErrors.rePassword = "Passwords do not match";
-
+      newErrors.username = "Username must be at least 3 characters";
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+    if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+    if (formData.password !== formData.repassword)
+      newErrors.repassword = "Passwords do not match";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,23 +45,29 @@ function Register() {
       );
       const data = await response.json();
 
-      if (data.message.includes("Failed!")) {
-        setErrors((prev) => ({
-          ...prev,
-          [data.message.includes("Email") ? "email" : "username"]: data.message,
-        }));
-      } else if (data.message === "User registered successfully!") {
-        navigate("/login");
+      if (data.message) {
+        setErrors({ general: data.message });
+        return;
       }
-    } catch (err) {
-      console.error(err);
+
+      if (data.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
+        alert("User registered successfully!");
+        navigate("/login"); 
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
     <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleRegister}>
-        <h1>Registration</h1>
+      <form
+        className={styles.form}
+        autoComplete="off"
+        onSubmit={handleRegister}
+      >
+        <h1>Register</h1>
         <input
           type="text"
           name="username"
@@ -90,7 +94,6 @@ function Register() {
           type="password"
           name="password"
           placeholder="Enter password..."
-          autoComplete="off"
           value={formData.password}
           onChange={handleChange}
           className={errors.password ? styles.error : ""}
@@ -101,23 +104,28 @@ function Register() {
 
         <input
           type="password"
-          name="rePassword"
-          placeholder="Re-enter password..."
-          autoComplete="off"
-          value={formData.rePassword}
+          name="repassword"
+          placeholder="Confirm password..."
+          value={formData.repassword}
           onChange={handleChange}
-          className={errors.rePassword ? styles.error : ""}
+          className={errors.repassword ? styles.error : ""}
         />
-        {errors.rePassword && (
-          <p className={styles.errorText}>{errors.rePassword}</p>
+        {errors.repassword && (
+          <p className={styles.errorText}>{errors.repassword}</p>
         )}
+
+        {errors.general && <p className={styles.errorText}>{errors.general}</p>}
 
         <button type="submit" className={styles.button}>
           Register
         </button>
+        <p>
+          Already have an account? <Link to="/login">Login here</Link>
+        </p>
       </form>
     </div>
   );
 }
 
 export default Register;
+ 
